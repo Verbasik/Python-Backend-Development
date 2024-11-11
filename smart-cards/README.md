@@ -1,5 +1,7 @@
 # Smart Cards (MVP)
 
+![link](https://raw.githubusercontent.com/Verbasik/Python-Backend-Development/refs/heads/main/smart-cards/png/image.png)
+
 Веб-приложение для создания и изучения карточек с поддержкой Markdown и LaTeX формул. Разработано специально для изучения научных дисциплин, где требуется работа с математическими формулами, химическими уравнениями и сложным форматированием текста.
 
 ## Основные возможности
@@ -111,19 +113,34 @@ class Card(CardBase):
 
 ## Установка и запуск
 
-1. Клонировать репозиторий
+1. Клонируйте репозиторий:
+    ```bash
+    git clone <git link>
+    cd smart-cards
+    ```
 
-2. Установить зависимости:
-   ```bash
-   pip install -r requirements
-   ```
+2. Создайте виртуальное окружение:
+    ```bash
+    # Linux/macOS
+    python -m venv venv
+    source venv/bin/activate
+    
+    # Windows
+    python -m venv venv
+    venv\Scripts\activate
+    ```
 
-3. Запустить сервер:
+3. Установите зависимости:
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+4. Запустить сервер:
    ```bash
    python main.py
    ```
 
-4. Открыть в браузере: http://localhost:8000
+5. Открыть в браузере: http://localhost:8000
 
 ## Системные требования
 
