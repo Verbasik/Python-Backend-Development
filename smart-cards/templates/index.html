@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Cards</title>
+    <link rel="icon" type="image/x-icon" href="/static/images/favicon.ico">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <!-- Конфигурация и загрузка MathJax -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                processEnvironments: true
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Smart Cards</h1>
+            <p>Create and study with markdown and LaTeX enabled flashcards</p>
+        </header>
+
+        <div class="card-form">
+            <h2>Add New Card</h2>
+            <div class="form-group">
+                <label for="frontInput">Front side (Markdown/LaTeX):</label>
+                <textarea id="frontInput" placeholder="Enter front side content (supports Markdown and LaTeX)" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="backInput">Back side (Markdown/LaTeX):</label>
+                <textarea id="backInput" placeholder="Enter back side content (supports Markdown and LaTeX)" required></textarea>
+            </div>
+            <button onclick="addCard()" class="btn primary">Add Card</button>
+        </div>
+
+        <div class="card-display">
+            <div class="card" onclick="flipCard(this)">
+                <div class="card-inner">
+                    <div class="card-front">
+                        <div id="frontContent" class="card-content"></div>
+                    </div>
+                    <div class="card-back">
+                        <div id="backContent" class="card-content"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="controls">
+                <button onclick="nextCard()" class="btn secondary">Next Card</button>
+                <button onclick="deleteCurrentCard()" class="btn danger">Delete Card</button>
+            </div>
+        </div>
+
+        <footer>
+            <p>Click on card to flip • Use markdown and LaTeX for formatting</p>
+            <p>Examples:</p>
+            <ul>
+                <li>Inline math: $x^2 + y^2 = r^2$</li>
+                <li>Display math: $$E = mc^2$$</li>
+            </ul>
+        </footer>
+    </div>
+    <script src="/static/js/main.js"></script>
+</body>
+</html>
