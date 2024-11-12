@@ -1,0 +1,38 @@
+# Ignore Mac OS specific files
+.DS_Store
+
+# Ignore environment-specific files
+.env
+
+# Ignore Python virtual environment
+.venv/
+
+# Ignore Jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore any compiled Python files
+*.pyc
+
+# Ignore any log files
+*.log
+
+# Ignore any database files
+*.db
+
+# Ignore any cache files
+*.cache
+
+# Ignore any backup files
+*.bak
+
+# Ignore any temporary files
+*.tmp
+
+# Ignore any IDE specific files
+.idea/
+.vscode/
+
+# Ignore files in the directory __pycache__
+__pycache__
+**/__pycache__/
+**/**/__pycache__/
