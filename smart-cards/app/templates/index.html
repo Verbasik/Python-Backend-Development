@@ -7,7 +7,6 @@
     <link rel="icon" type="image/x-icon" href="/static/images/favicon.ico">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <!-- Конфигурация и загрузка MathJax -->
     <script>
         window.MathJax = {
             tex: {
@@ -31,8 +30,28 @@
             <p>Create and study with markdown and LaTeX enabled flashcards</p>
         </header>
 
+        <!-- Секция категорий -->
+        <div class="categories-section">
+            <h2>Categories</h2>
+            <div class="categories-form">
+                <input type="text" id="categoryName" placeholder="Category name" required>
+                <input type="text" id="categoryDescription" placeholder="Description (optional)">
+                <button onclick="addCategory()" class="btn primary">Add Category</button>
+            </div>
+            <div class="categories-list" id="categoriesList">
+                <!-- Categories will be rendered here -->
+            </div>
+        </div>
+
+        <!-- Форма создания карточки -->
         <div class="card-form">
             <h2>Add New Card</h2>
+            <div class="form-group">
+                <label for="categorySelect">Category:</label>
+                <select id="categorySelect" required>
+                    <option value="">Select category</option>
+                </select>
+            </div>
             <div class="form-group">
                 <label for="frontInput">Front side (Markdown/LaTeX):</label>
                 <textarea id="frontInput" placeholder="Enter front side content (supports Markdown and LaTeX)" required></textarea>
@@ -44,7 +63,15 @@
             <button onclick="addCard()" class="btn primary">Add Card</button>
         </div>
 
+        <!-- Секция отображения карточек -->
         <div class="card-display">
+            <div class="category-filter">
+                <label for="filterCategory">Study category:</label>
+                <select id="filterCategory" onchange="filterByCategory()">
+                    <option value="">All categories</option>
+                </select>
+            </div>
+            
             <div class="card" onclick="flipCard(this)">
                 <div class="card-inner">
                     <div class="card-front">
@@ -55,6 +82,7 @@
                     </div>
                 </div>
             </div>
+            
             <div class="controls">
                 <button onclick="nextCard()" class="btn secondary">Next Card</button>
                 <button onclick="deleteCurrentCard()" class="btn danger">Delete Card</button>
@@ -62,11 +90,12 @@
         </div>
 
         <footer>
-            <p>Click on card to flip • Use markdown and LaTeX for formatting</p>
+            <p>Click on card to flip • Space/Enter to flip • Right arrow/N for next</p>
             <p>Examples:</p>
             <ul>
                 <li>Inline math: $x^2 + y^2 = r^2$</li>
                 <li>Display math: $$E = mc^2$$</li>
+                <li>**Bold** and *italic* text</li>
             </ul>
         </footer>
     </div>

@@ -9,7 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from typing import List
 
 # Локальные модули
-from models.domain import Card, CardCreate
+from models.domain import Card, Category, CardCreate, CategoryCreate
 from core.services import CardService
 from api.dependencies import get_card_service
 
@@ -97,7 +97,8 @@ async def get_random_card(
             status_code=500,
             detail=f"Ошибка при получении случайной карточки: {str(e)}"
         )
-    
+
+
 @router.delete("/cards/{card_id}")
 async def delete_card(
     card_id: int,
@@ -126,4 +127,116 @@ async def delete_card(
         raise HTTPException(
             status_code=500,
             detail=f"Ошибка при удалении карточки: {str(e)}"
+        )
+
+    
+@router.post("/categories/", response_model=Category)
+async def create_category(
+    category: CategoryCreate,
+    service: CardService = Depends(get_card_service)
+) -> Category:
+    """
+    Description:
+        Создает новую категорию.
+
+    Args:
+        category: Данные для создания категории
+        service: Сервис для работы с категориями
+
+    Returns:
+        Category: Созданная категория
+
+    Raises:
+        HTTPException: При ошибке создания категории
+    """
+    try:
+        return await service.create_category(category)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Ошибка при создании категории: {str(e)}"
+        )
+
+
+@router.get("/categories/", response_model=List[Category])
+async def get_categories(
+    service: CardService = Depends(get_card_service)
+) -> List[Category]:
+    """
+    Description:
+        Получает список всех категорий.
+
+    Args:
+        service: Сервис для работы с категориями
+
+    Returns:
+        List[Category]: Список категорий
+
+    Raises:
+        HTTPException: При ошибке получения категорий
+    """
+    try:
+        return await service.get_categories()
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Ошибка при получении категорий: {str(e)}"
+        )
+
+
+@router.get("/categories/{category_id}/cards", response_model=List[Card])
+async def get_cards_by_category(
+    category_id: int,
+    service: CardService = Depends(get_card_service)
+) -> List[Card]:
+    """
+    Description:
+        Получает список карточек по идентификатору категории.
+
+    Args:
+        category_id: Идентификатор категории для поиска карточек
+        service: Сервис для работы с карточками
+
+    Returns:
+        List[Card]: Список карточек категории
+
+    Raises:
+        HTTPException: При ошибке получения карточек категории
+    """
+    try:
+        return await service.get_cards_by_category(category_id)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Ошибка при получении карточек категории: {str(e)}"
+        )
+
+
+@router.get("/categories/{category_id}/cards/random", response_model=Card)
+async def get_random_card_by_category(
+    category_id: int,
+    service: CardService = Depends(get_card_service)
+) -> Card:
+    """
+    Description:
+        Получает случайную карточку по идентификатору категории.
+
+    Args:
+        category_id: Идентификатор категории для поиска случайной карточки
+        service: Сервис для работы с карточками
+
+    Returns:
+        Card: Случайная карточка из категории
+
+    Raises:
+        HTTPException: При ошибке получения случайной карточки из категории
+    """
+    try:
+        return await service.get_random_card_by_category(category_id)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Ошибка при получении случайной карточки из категории: {str(e)}"
         )
