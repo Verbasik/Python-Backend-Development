@@ -18,6 +18,7 @@ import uvicorn
 # Локальные модули
 from api.routes import router
 from db.repositories import init_db
+from db.migrations   import apply_migrations
 
 
 @asynccontextmanager
@@ -34,6 +35,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         None
     """
     init_db()
+    apply_migrations()
     yield
 
 

@@ -1,18 +1,19 @@
+/* Общие стили */
 :root {
     --primary-color: #4a90e2;
     --secondary-color: #6c757d;
     --danger-color: #dc3545;
     --success-color: #28a745;
     --background-color: #f8f9fa;
-    --card-background: #ffffff;
-    --text-color: #333333;
+    --text-color: #333;
     --border-color: #dee2e6;
+    --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 * {
-    box-sizing: border-box;
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
 
 body {
@@ -23,9 +24,9 @@ body {
 }
 
 .container {
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 2rem;
 }
 
 /* Заголовок */
@@ -35,6 +36,7 @@ header {
 }
 
 header h1 {
+    font-size: 2.5rem;
     color: var(--primary-color);
     margin-bottom: 0.5rem;
 }
@@ -43,13 +45,77 @@ header p {
     color: var(--secondary-color);
 }
 
-/* Форма добавления карточек */
+/* Секция категорий */
+.categories-section {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--card-shadow);
+}
+
+.categories-section h2 {
+    color: var(--text-color);
+    margin-bottom: 1rem;
+}
+
+.categories-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.categories-form input {
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.categories-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.category-item {
+    background: var(--background-color);
+    border-radius: 6px;
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.category-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--card-shadow);
+}
+
+.category-info h3 {
+    margin-bottom: 0.5rem;
+    color: var(--primary-color);
+}
+
+.category-info p {
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+    margin-bottom: 0.5rem;
+}
+
+.category-info small {
+    display: block;
+    color: var(--secondary-color);
+    font-size: 0.8rem;
+}
+
+/* Форма создания карточки */
 .card-form {
-    background: var(--card-background);
+    background: white;
     padding: 1.5rem;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin-bottom: 2rem;
+    box-shadow: var(--card-shadow);
 }
 
 .form-group {
@@ -60,78 +126,47 @@ header p {
     display: block;
     margin-bottom: 0.5rem;
     color: var(--text-color);
+    font-weight: 500;
 }
 
-textarea {
+.form-group textarea,
+.form-group select {
     width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 1rem;
+    font-family: inherit;
+}
+
+.form-group textarea {
     height: 100px;
+    resize: vertical;
+}
+
+/* Секция отображения карточек */
+.card-display {
+    margin-bottom: 2rem;
+}
+
+.category-filter {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.category-filter select {
     padding: 0.5rem;
     border: 1px solid var(--border-color);
     border-radius: 4px;
-    resize: vertical;
-    font-family: inherit;
-    margin-bottom: 1rem;
-}
-
-/* Кнопки */
-.btn {
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
     font-size: 1rem;
-    transition: background-color 0.2s, transform 0.1s;
-}
-
-.btn:hover {
-    transform: translateY(-1px);
-}
-
-.btn:active {
-    transform: translateY(0);
-}
-
-.primary {
-    background-color: var(--primary-color);
-    color: white;
-}
-
-.primary:hover {
-    background-color: #357abd;
-}
-
-.secondary {
-    background-color: var(--secondary-color);
-    color: white;
-}
-
-.secondary:hover {
-    background-color: #5a6268;
-}
-
-.danger {
-    background-color: var(--danger-color);
-    color: white;
-}
-
-.danger:hover {
-    background-color: #c82333;
-}
-
-/* Карточка */
-.card-display {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 2rem 0;
+    margin-left: 0.5rem;
 }
 
 .card {
-    width: 210%;
-    max-width: 760px;
-    height: 300px;
     perspective: 1000px;
-    margin-bottom: 1rem;
+    height: 300px;
+    margin-bottom: 1.5rem;
+    cursor: pointer;
 }
 
 .card-inner {
@@ -139,9 +174,8 @@ textarea {
     width: 100%;
     height: 100%;
     text-align: center;
-    transition: transform 0.8s;
+    transition: transform 0.6s;
     transform-style: preserve-3d;
-    cursor: pointer;
 }
 
 .card.flipped .card-inner {
@@ -154,10 +188,10 @@ textarea {
     width: 100%;
     height: 100%;
     backface-visibility: hidden;
-    background: var(--card-background);
+    background: white;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     padding: 1.5rem;
+    box-shadow: var(--card-shadow);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -165,34 +199,140 @@ textarea {
 
 .card-back {
     transform: rotateY(180deg);
-    background-color: var(--card-background);
 }
 
 .card-content {
     max-width: 100%;
-    max-height: 100%;
-    overflow: auto;
+    overflow-y: auto;
+    padding: 1rem;
+}
+
+/* Анимации карточек */
+@keyframes slideFromRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideFromLeft {
+    from { transform: translateX(-100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes zoomIn {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes slideFromTop {
+    from { transform: translateY(-100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
 }
 
 /* Контролы */
 .controls {
     display: flex;
+    justify-content: center;
     gap: 1rem;
-    margin-top: 1rem;
+    margin-top: 1.5rem;
 }
 
-/* Подвал */
+/* Кнопки */
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    font-weight: 500;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn.primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn.primary:hover {
+    background-color: #357abd;
+}
+
+.btn.secondary {
+    background-color: var(--secondary-color);
+    color: white;
+}
+
+.btn.secondary:hover {
+    background-color: #5a6268;
+}
+
+.btn.danger {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.btn.danger:hover {
+    background-color: #c82333;
+}
+
+/* Пустое состояние */
+.empty-state {
+    color: var(--secondary-color);
+    text-align: center;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+/* Сообщения об ошибках */
+.error {
+    color: var(--danger-color);
+    text-align: center;
+    font-size: 1rem;
+    padding: 1rem;
+}
+
+/* Footer */
 footer {
     text-align: center;
-    margin-top: 2rem;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
     color: var(--secondary-color);
-    font-size: 0.9rem;
+}
+
+footer p {
+    margin-bottom: 1rem;
+}
+
+footer ul {
+    list-style: none;
+    padding: 0;
+}
+
+footer li {
+    margin-bottom: 0.5rem;
 }
 
 /* Адаптивный дизайн */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
     .container {
-        padding: 10px;
+        padding: 1rem;
+    }
+
+    .categories-form {
+        grid-template-columns: 1fr;
     }
 
     .card {
@@ -208,43 +348,51 @@ footer {
     }
 }
 
-/* Стили для markdown контента */
+/* Стили для LaTeX формул */
+.mjx-chtml {
+    margin: 1rem 0;
+}
+
+/* Стили для Markdown */
 .card-content {
-    font-size: 1.1rem;
+    line-height: 1.6;
 }
 
 .card-content h1,
 .card-content h2,
-.card-content h3 {
-    margin-bottom: 0.5rem;
+.card-content h3,
+.card-content h4,
+.card-content h5,
+.card-content h6 {
+    margin: 1rem 0;
 }
 
 .card-content p {
-    margin-bottom: 1rem;
+    margin: 0.5rem 0;
 }
 
 .card-content ul,
 .card-content ol {
-    margin-left: 1.5rem;
-    margin-bottom: 1rem;
+    margin: 0.5rem 0;
+    padding-left: 1.5rem;
 }
 
 .card-content code {
-    background-color: #f5f5f5;
+    background: #f4f4f4;
     padding: 0.2rem 0.4rem;
     border-radius: 3px;
+    font-family: monospace;
 }
 
 .card-content pre {
-    background-color: #f5f5f5;
+    background: #f4f4f4;
     padding: 1rem;
     border-radius: 4px;
     overflow-x: auto;
-    margin-bottom: 1rem;
 }
 
-/* Стили для LaTeX формул */
-.card-content .MathJax {
+.card-content img {
     max-width: 100%;
-    overflow-x: auto;
+    height: auto;
+    margin: 1rem 0;
 }
