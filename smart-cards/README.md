@@ -1,6 +1,6 @@
 # Smart Cards (MVP)
 
-![link](https://raw.githubusercontent.com/Verbasik/Python-Backend-Development/refs/heads/main/smart-cards/png/image.png)
+![link](https://raw.githubusercontent.com/Verbasik/Python-Backend-Development/refs/heads/main/smart-cards/png/image.jpg)
 
 Веб-приложение для создания и изучения карточек с поддержкой Markdown и LaTeX формул. Разработано специально для изучения научных дисциплин, где требуется работа с математическими формулами, химическими уравнениями и сложным форматированием текста.
 
