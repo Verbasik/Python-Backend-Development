@@ -13,6 +13,28 @@ const animations = [
     'slideFromTop'
 ];
 
+window.MathJax = {
+    tex: {
+        inlineMath: [['$', '$']],
+        displayMath: [['$$', '$$']],
+        packages: {'[+]': ['ams', 'newcommand', 'noerrors', 'noundefined']},
+        tags: 'ams',
+        processEnvironments: true,
+        processRefs: true,
+        macros: {
+            matrix: ['{\\begin{pmatrix}#1\\end{pmatrix}}', 1],
+            vector: ['{\\begin{pmatrix}#1\\end{pmatrix}}', 1]
+        }
+    },
+    options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+        processHtmlClass: 'math-tex'
+    },
+    loader: {
+        load: ['[tex]/ams', '[tex]/newcommand', '[tex]/noerrors', '[tex]/noundefined']
+    }
+};
+
 // Функция для получения случайной анимации
 function getRandomAnimation() {
     const index = Math.floor(Math.random() * animations.length);
@@ -31,8 +53,68 @@ const hideLoading = () => {
 };
 
 const showError = (message) => {
+    console.error('Error:', message);
     alert(message);
 };
+
+// Функции для работы с темой
+function initTheme() {
+    const themeToggle = document.getElementById('themeToggle');
+    if (!themeToggle) {
+        console.error('Theme toggle button not found');
+        return;
+    }
+
+    // Определяем предпочтительную системную тему
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const savedTheme = localStorage.getItem('theme') || (prefersDark ? 'dark' : 'light');
+    
+    applyTheme(savedTheme);
+    setupThemeListeners(themeToggle);
+}
+
+function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    console.log(`Applied theme: ${theme}`);
+}
+
+function setupThemeListeners(themeToggle) {
+    // Слушатель для кнопки переключения
+    themeToggle.addEventListener('click', toggleTheme);
+    
+    // Слушатель для системных изменений темы
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+        if (!localStorage.getItem('theme')) {
+            applyTheme(e.matches ? 'dark' : 'light');
+        }
+    });
+}
+
+function toggleTheme() {
+    try {
+        const root = document.documentElement;
+        const currentTheme = root.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        
+        console.log(`Switching theme from ${currentTheme} to ${newTheme}`);
+        
+        applyTheme(newTheme);
+        localStorage.setItem('theme', newTheme);
+        
+        animateThemeToggle();
+    } catch (error) {
+        console.error('Error switching theme:', error);
+        showError('Failed to switch theme');
+    }
+}
+
+function animateThemeToggle() {
+    const button = document.getElementById('themeToggle');
+    if (button) {
+        button.style.transform = 'scale(0.9)';
+        setTimeout(() => button.style.transform = 'scale(1)', 200);
+    }
+}
 
 // Функции для работы с категориями
 async function loadCategories() {
@@ -58,6 +140,11 @@ async function loadCategories() {
 
 function renderCategories() {
     const categoriesList = document.getElementById('categoriesList');
+    if (!categoriesList) {
+        console.error('Categories list element not found');
+        return;
+    }
+
     categoriesList.innerHTML = categories.map(category => `
         <div class="category-item">
             <div class="category-info">
@@ -73,6 +160,11 @@ function updateCategorySelects() {
     const createSelect = document.getElementById('categorySelect');
     const filterSelect = document.getElementById('filterCategory');
     
+    if (!createSelect || !filterSelect) {
+        console.error('Category select elements not found');
+        return;
+    }
+    
     const options = categories.map(category => 
         `<option value="${category.id}">${category.name} (${category.cards_count})</option>`
     );
@@ -87,6 +179,11 @@ async function addCategory() {
     const nameInput = document.getElementById('categoryName');
     const descInput = document.getElementById('categoryDescription');
     
+    if (!nameInput || !descInput) {
+        showError('Category form elements not found');
+        return;
+    }
+
     const name = nameInput.value.trim();
     const description = descInput.value.trim();
 
@@ -131,9 +228,17 @@ async function addCard() {
     if (isLoading) return;
 
     try {
-        const frontContent = document.getElementById('frontInput').value.trim();
-        const backContent = document.getElementById('backInput').value.trim();
-        const categoryId = document.getElementById('categorySelect').value;
+        const frontInput = document.getElementById('frontInput');
+        const backInput = document.getElementById('backInput');
+        const categorySelect = document.getElementById('categorySelect');
+
+        if (!frontInput || !backInput || !categorySelect) {
+            throw new Error('Card form elements not found');
+        }
+
+        const frontContent = frontInput.value.trim();
+        const backContent = backInput.value.trim();
+        const categoryId = categorySelect.value;
 
         // Валидация
         if (!frontContent || !backContent) {
@@ -166,13 +271,11 @@ async function addCard() {
         }
 
         // Очищаем форму
-        document.getElementById('frontInput').value = '';
-        document.getElementById('backInput').value = '';
+        frontInput.value = '';
+        backInput.value = '';
 
-        // Обновляем список категорий для обновления счетчиков
+        // Обновляем список категорий и показываем новую карточку
         await loadCategories();
-        
-        // Показываем новую карточку
         await nextCard();
         
     } catch (error) {
@@ -190,10 +293,15 @@ async function nextCard() {
         showLoading();
 
         const cardElement = document.querySelector('.card');
-        cardElement.style.animation = 'none';
-        cardElement.offsetHeight;
+        if (!cardElement) {
+            throw new Error('Card element not found');
+        }
 
-        const categoryId = document.getElementById('filterCategory').value;
+        // Сброс анимации
+        cardElement.style.animation = 'none';
+        cardElement.offsetHeight; // Trigger reflow
+
+        const categoryId = document.getElementById('filterCategory')?.value;
         const url = categoryId ? 
             `/api/categories/${categoryId}/cards/random` : 
             '/api/cards/random';
@@ -203,9 +311,13 @@ async function nextCard() {
         if (!response.ok) {
             if (response.status === 404) {
                 currentCard = null;
-                document.getElementById('frontContent').innerHTML = 
-                    '<p class="empty-state">No cards available in this category.<br>Add some cards first!</p>';
-                document.getElementById('backContent').innerHTML = '';
+                const frontContent = document.getElementById('frontContent');
+                const backContent = document.getElementById('backContent');
+                
+                if (frontContent && backContent) {
+                    frontContent.innerHTML = '<p class="empty-state">No cards available in this category.<br>Add some cards first!</p>';
+                    backContent.innerHTML = '';
+                }
                 return;
             }
             throw new Error('Failed to fetch card');
@@ -217,7 +329,6 @@ async function nextCard() {
         cardElement.style.animation = `${animation} 0.5s ease-out`;
         
         renderCard();
-        
         cardElement.classList.remove('flipped');
 
     } catch (error) {
@@ -247,10 +358,7 @@ async function deleteCurrentCard() {
             throw new Error(error.message || 'Failed to delete card');
         }
 
-        // Обновляем список категорий для обновления счетчиков
         await loadCategories();
-        
-        // Переходим к следующей карточке
         await nextCard();
 
     } catch (error) {
@@ -265,21 +373,41 @@ async function filterByCategory() {
     await nextCard();
 }
 
-function renderCard() {
+async function renderCard() {
     if (!currentCard) return;
 
     const frontContent = document.getElementById('frontContent');
     const backContent = document.getElementById('backContent');
     
+    if (!frontContent || !backContent) {
+        console.error('Card content elements not found');
+        return;
+    }
+
     try {
-        // Рендерим markdown
-        frontContent.innerHTML = marked.parse(currentCard.front);
-        backContent.innerHTML = marked.parse(currentCard.back);
+        // Защищаем LaTeX выражения и обрабатываем переносы строк в матрицах
+        const protectTeX = (text) => {
+            return text.replace(/(\$\$[\s\S]+?\$\$|\$[^\$\n]+?\$)/g, (match) => {
+                // Сохраняем переносы строк в матрицах
+                const preserved = match.replace(/\\\\/g, '\\newline');
+                return `<span class="math-tex">${preserved}</span>`;
+            });
+        };
+
+        // Рендерим с защитой LaTeX
+        const frontHtml = marked.parse(protectTeX(currentCard.front));
+        const backHtml = marked.parse(protectTeX(currentCard.back));
         
-        // Рендерим формулы
-        MathJax.typesetPromise([frontContent, backContent]).catch(err => {
-            console.error('MathJax error:', err);
-        });
+        frontContent.innerHTML = frontHtml;
+        backContent.innerHTML = backHtml;
+        
+        // Очищаем предыдущий рендеринг MathJax
+        const mathElements = [...frontContent.getElementsByClassName('math-tex'), 
+                            ...backContent.getElementsByClassName('math-tex')];
+        mathElements.forEach(el => MathJax.typesetClear([el]));
+        
+        // Запускаем MathJax с обновленной конфигурацией
+        await MathJax.typesetPromise([frontContent, backContent]);
 
     } catch (error) {
         console.error('Error rendering card:', error);
@@ -289,52 +417,35 @@ function renderCard() {
 }
 
 function flipCard(cardElement) {
-    if (!currentCard || isLoading) return;
+    if (!currentCard || isLoading || !cardElement) return;
     cardElement.classList.toggle('flipped');
 }
 
-// Keyboard shortcuts
+// Обработка клавиатурных сокращений
 document.addEventListener('keydown', (event) => {
     if (isLoading) return;
+
+    if (event.target.matches('textarea')) return;
 
     switch(event.key) {
         case ' ':  // Space
         case 'Enter':
-            if (!event.target.matches('textarea')) {
-                event.preventDefault();
-                document.querySelector('.card').classList.toggle('flipped');
-            }
+            event.preventDefault();
+            const card = document.querySelector('.card');
+            if (card) flipCard(card);
             break;
+            
         case 'ArrowRight':
         case 'n':
-            if (!event.target.matches('textarea')) {
-                event.preventDefault();
-                nextCard();
-            }
+            event.preventDefault();
+            nextCard();
             break;
+            
         case 'Delete':
-            if (!event.target.matches('textarea')) {
-                event.preventDefault();
-                deleteCurrentCard();
-            }
+            event.preventDefault();
+            deleteCurrentCard();
             break;
     }
-});
-
-// Инициализация
-document.addEventListener('DOMContentLoaded', async () => {
-    // Настройка marked
-    marked.setOptions({
-        gfm: true,
-        breaks: true,
-        sanitize: false,
-        smartLists: true,
-        smartypants: true
-    });
-
-    // Загружаем категории и первую карточку
-    await loadCategories();
-    await nextCard();
 });
 
 // Предотвращаем случайное закрытие страницы при редактировании
@@ -343,8 +454,40 @@ window.addEventListener('beforeunload', (event) => {
     const backInput = document.getElementById('backInput');
     const categoryName = document.getElementById('categoryName');
     
-    if (frontInput.value.trim() || backInput.value.trim() || categoryName.value.trim()) {
+    if (frontInput?.value.trim() || backInput?.value.trim() || categoryName?.value.trim()) {
         event.preventDefault();
         event.returnValue = '';
+    }
+});
+
+// Инициализация приложения
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        // Инициализация темы
+        initTheme();
+        
+        // Настройка marked
+        marked.setOptions({
+            gfm: true,
+            breaks: true,
+            sanitize: false,
+            smartLists: true,
+            smartypants: true,
+            pedantic: false,
+            mangle: false,
+            headerIds: false
+        });
+
+        // Ждем загрузки MathJax
+        await MathJax.startup.promise;
+        
+        // Загружаем категории и первую карточку
+        await loadCategories();
+        await nextCard();
+        
+        console.log('Application initialized successfully');
+    } catch (error) {
+        console.error('Error initializing application:', error);
+        showError('Failed to initialize application');
     }
 });
