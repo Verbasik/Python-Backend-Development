@@ -1,0 +1,17 @@
+# config/app_config.yaml
+service:
+  name: AsciiDoc Validator
+  version: 0.1.0
+  
+server:
+  host: 0.0.0.0
+  port: 8000
+  
+logging:
+  level: INFO
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  
+validation:
+  max_file_size_mb: 10
+  timeout_seconds: 60
+  enable_autocorrection: false

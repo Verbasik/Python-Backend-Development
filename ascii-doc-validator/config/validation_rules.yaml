@@ -1,0 +1,96 @@
+# config/validation_rules.yaml
+# Правила для синтаксической валидации
+- id: SYNTAX-001
+  name: AsciiDoc Headers Validation
+  description: Проверка корректности заголовков AsciiDoc
+  type: SYNTAX
+  severity: ERROR
+  config:
+    header_pattern: "^={1,6}\\s.+$"
+    min_length: 3
+    max_length: 100
+
+- id: SYNTAX-002
+  name: Code Block Format
+  description: Проверка форматирования блоков кода
+  type: SYNTAX
+  severity: WARNING
+  config:
+    valid_formats:
+      - "[source,{language}]"
+      - "```{language}"
+    languages:
+      - java
+      - python
+      - javascript
+      - bash
+      - json
+      - yaml
+
+- id: SYNTAX-003
+  name: List Structure Validation
+  description: Проверка структуры списков
+  type: SYNTAX
+  severity: WARNING
+  config:
+    allow_mixed_lists: false
+
+- id: SYNTAX-004
+  name: Table Validation
+  description: Проверка структуры таблиц
+  type: SYNTAX
+  severity: ERROR
+  config:
+    require_consistent_columns: true
+
+- id: SYNTAX-005
+  name: Link Validation
+  description: Проверка ссылок и якорей
+  type: SYNTAX
+  severity: WARNING
+  config:
+    check_internal_links: true
+    check_external_links: true
+    timeout_seconds: 5
+
+# Тест новой логики
+- id: COMPLETENESS-METHOD-001
+  name: Method documentation completeness
+  description: |
+    Убедиться, что каждый public-метод из Java-кода задокументирован в AsciiDoc.
+  type: COMPLETENESS
+  severity: ERROR
+  config:
+    # Отделяем имя класса от имени метода
+    ## Группа 1 = имя класса, Группа 2 = имя метода
+    method_name_pattern: "([^.]+)\\.([^.]+)"
+    # Методы определения секций с описаниями методов
+    method_section_markers:
+      - type: "title_pattern"
+        pattern: "Метод\\s+{method_name_short}"
+      - type: "title_pattern"
+        pattern: "Method\\s+{method_name_short}"
+      - type: "title_exact"
+        pattern: "{method_name_short}"
+      - type: "content_pattern"
+        pattern: "```\\w*\\s*(?:public|private|protected)?\\s+\\w+\\s+{method_name_short}\\s*\\("
+    # Параметры для извлечения информации о параметрах метода
+    parameter_markers:
+      - type: "block"
+        pattern: "\\*Параметры:\\*\\s*(.*?)(?=\\*|\\Z)"
+        format: "\\*\\s*`([^`]+)`\\s*—\\s*([^*\\n]+)"
+      - type: "block"
+        pattern: "\\*Parameters:\\*\\s*(.*?)(?=\\*|\\Z)"
+        format: "\\*\\s*`([^`]+)`\\s*-\\s*([^*\\n]+)"
+      - type: "inline"
+        pattern: "@param\\s+(\\w+)\\s+([^\\n@]*)"
+    # Контейнеры методов - секции, которые могут содержать описания методов
+    method_containers:
+      - "Методы класса"
+      - "Методы"
+      - "Methods"
+      - "Class Methods"
+      - "API"
+      - "API Reference"
+      - "Функции"
+      - "Functions"
