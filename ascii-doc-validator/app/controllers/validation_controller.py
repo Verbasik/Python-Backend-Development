@@ -14,12 +14,14 @@ JSON-отчета или краткой сводки.
 """
 
 # Импорты стандартной библиотеки Python
+import os
 import json
 
 # Импорты сторонних библиотек
 from fastapi import (
     APIRouter,
     File,
+    Request,
     UploadFile,
     Form,
     HTTPException,
@@ -37,6 +39,8 @@ from services.validators.syntax_validator import SyntaxValidator
 from services.source_code_analyzer import SourceCodeAnalyzer
 from services.code_documentation_matcher import CodeDocumentationMatcher
 from models.validation_report import IssueType, ValidationStatus
+from services.project_documentation_manager import ProjectDocumentationManager
+from services.project_code_documentation_matcher import ProjectCodeDocumentationMatcher
 
 router = APIRouter()
 
@@ -191,7 +195,7 @@ async def validate_documentation_with_code(
     parsed_doc = doc_parser.parse(doc_content_str)
 
     # # ДЛЯ ОТЛАДКИ
-    print("Структура документации:", json.dumps(parsed_doc, indent=2, ensure_ascii=False, default=str))
+    # print("Структура документации:", json.dumps(parsed_doc, indent=2, ensure_ascii=False, default=str))
     
     # Создаем временные файлы для кода и документации
     import tempfile
@@ -248,3 +252,153 @@ async def validate_documentation_with_code(
     finally:
         # Удаляем временный файл
         os.unlink(temp_code_path)
+
+@router.post("/validate-project")
+async def validate_project(
+    code_dir_path: str = Form(...),
+    docs_dir_path: str = Form(...),
+    format: Optional[str] = Form("json"),
+) -> JSONResponse:
+    """
+    Description:
+    ---------------
+        Валидирует проект, сопоставляя исходный код из указанной директории 
+        с документацией в формате AsciiDoc из другой указанной директории.
+
+    Args:
+    ---------------
+        code_dir_path: Путь к директории с исходным кодом проекта.
+        docs_dir_path: Путь к директории с документацией в формате AsciiDoc (.adoc).
+        format: Формат возвращаемого отчета ("json" или "summary").
+
+    Returns:
+    ---------------
+        JSONResponse: Ответ с результатами валидации проекта.
+
+    Raises:
+    ---------------
+        HTTPException: Если директории не существуют или указан неверный формат отчета.
+    """
+    # Проверяем существование директорий
+    if not os.path.isdir(code_dir_path):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Директория с исходным кодом не найдена: {code_dir_path}",
+        )
+    
+    if not os.path.isdir(docs_dir_path):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Директория с документацией не найдена: {docs_dir_path}",
+        )
+    
+    # Анализируем директорию с исходным кодом
+    code_structures = source_code_analyzer.analyze_directory(code_dir_path, recursive=True)
+    
+    # Создаем объект ProjectDocumentationManager для работы с документацией
+    doc_manager = ProjectDocumentationManager(docs_dir_path)
+    
+    # Анализируем директорию с документацией
+    doc_structures = doc_manager.parse_documentation_directory()
+    
+    # Сопоставляем код и документацию
+    project_matcher = ProjectCodeDocumentationMatcher(source_code_analyzer)
+    validation_report = project_matcher.match_project(code_structures, doc_structures)
+    
+    # Возвращаем отчет в запрошенном формате
+    if format.lower() == "json":
+        return JSONResponse(
+            content=json.loads(report_generator.generate_project_json(validation_report)),
+            status_code=200
+        )
+    elif format.lower() == "summary":
+        return JSONResponse(
+            content=report_generator.generate_project_summary(validation_report),
+            status_code=200,
+        )
+    else:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Неподдерживаемый формат отчета: {format}",
+        )
+    
+# Модифицированная версия эндпоинта для работы с путями
+@router.post("/validate-project-paths")
+async def validate_project_paths(
+    request: Request,
+    code_dir_path: str = Form(...),
+    docs_dir_path: str = Form(...),
+    format: Optional[str] = Form("json"),
+) -> JSONResponse:
+    """
+    Description:
+    ---------------
+        Валидирует проект по указанным путям к директориям с кодом и документацией.
+
+    Args:
+    ---------------
+        request: Запрос FastAPI.
+        code_dir_path: Путь к директории с исходным кодом проекта.
+        docs_dir_path: Путь к директории с документацией в формате AsciiDoc (.adoc).
+        format: Формат возвращаемого отчета ("json" или "summary").
+
+    Returns:
+    ---------------
+        JSONResponse: Ответ с результатами валидации проекта.
+
+    Raises:
+    ---------------
+        HTTPException: Если директории не существуют или указан неверный формат отчета.
+    """
+    # Проверяем существование директорий
+    if not os.path.isdir(code_dir_path):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Директория с исходным кодом не найдена: {code_dir_path}",
+        )
+    
+    if not os.path.isdir(docs_dir_path):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Директория с документацией не найдена: {docs_dir_path}",
+        )
+    
+    try:
+        # Анализируем структуру проекта
+        project_structure = source_code_analyzer.analyze_project(code_dir_path, docs_dir_path)
+        
+        # Создаем сопоставитель кода и документации проекта
+        project_matcher = ProjectCodeDocumentationMatcher(source_code_analyzer)
+        
+        # Выполняем сопоставление и валидацию
+        validation_report = project_matcher.match_project(
+            project_structure.code_structures, 
+            project_structure.doc_structures
+        )
+        
+        # Возвращаем отчет в запрошенном формате
+        if format.lower() == "json":
+            return JSONResponse(
+                content=json.loads(report_generator.generate_project_json(validation_report)),
+                status_code=200
+            )
+        elif format.lower() == "summary":
+            return JSONResponse(
+                content=report_generator.generate_project_summary(validation_report),
+                status_code=200,
+            )
+        else:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Неподдерживаемый формат отчета: {format}",
+            )
+    
+    except Exception as e:
+        # Логирование ошибки
+        print(f"Ошибка при валидации проекта: {str(e)}")
+        
+        # Возвращаем сообщение об ошибке
+        raise HTTPException(
+            status_code=500,
+            detail=f"Ошибка при валидации проекта: {str(e)}",
+        )

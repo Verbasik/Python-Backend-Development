@@ -21,6 +21,8 @@ from typing import Dict, List, Optional, Any
 from services.analyzers.analyzer_factory import AnalyzerFactory, detect_language_from_file
 from services.analyzers import analyzer_factory
 from models.code_structure import CodeStructure, LanguageType
+from models.project_structure import ProjectStructure
+from services.project_documentation_manager import ProjectDocumentationManager
 
 
 class SourceCodeAnalyzer:
@@ -197,3 +199,59 @@ class SourceCodeAnalyzer:
             List[str]: Список поддерживаемых языков.
         """
         return self.analyzer_factory.get_supported_languages()
+    
+    def analyze_project(self, code_dir: str, docs_dir: str) -> ProjectStructure:
+        """
+        Description:
+        ---------------
+            Анализирует структуру проекта, включая код и документацию.
+
+        Args:
+        ---------------
+            code_dir: Путь к директории с кодом.
+            docs_dir: Путь к директории с документацией.
+
+        Returns:
+        ---------------
+            ProjectStructure: Структура проекта.
+
+        Raises:
+        ---------------
+            FileNotFoundError: Если директории не существуют.
+        """
+        
+        # Проверяем существование директорий
+        if not os.path.isdir(code_dir):
+            raise FileNotFoundError(f"Директория с кодом не найдена: {code_dir}")
+        
+        if not os.path.isdir(docs_dir):
+            raise FileNotFoundError(f"Директория с документацией не найдена: {docs_dir}")
+        
+        # Создаем структуру проекта
+        project = ProjectStructure(code_dir=code_dir, docs_dir=docs_dir)
+        
+        # Анализируем код
+        code_structures = self.analyze_directory(code_dir, recursive=True)
+        for file_path, structure in code_structures.items():
+            project.add_code_structure(file_path, structure)
+        
+        # Анализируем документацию
+        doc_manager = ProjectDocumentationManager(docs_dir)
+        doc_structures = doc_manager.parse_documentation_directory()
+        for file_path, structure in doc_structures.items():
+            project.add_doc_structure(file_path, structure)
+        
+        # Создаем сопоставления файлов
+        for code_path, code_structure in code_structures.items():
+            # Определяем имя класса
+            class_name = None
+            if code_structure.classes:
+                class_name = code_structure.classes[0].name
+            
+            # Ищем соответствующую документацию
+            doc_path = doc_manager.find_doc_for_code_file(code_path, class_name)
+            
+            # Добавляем сопоставление
+            project.add_file_mapping(code_path, doc_path, class_name)
+        
+        return project

@@ -1,0 +1,140 @@
+= Документация для класса DiscountCalculator
+:doctype: book
+:toc:
+:toclevels: 2
+
+== Введение
+
+Класс `DiscountCalculator` предназначен для расчета скидок на товары на основе различных параметров покупателя. Калькулятор учитывает несколько факторов при определении скидки:
+
+* Базовый процент скидки (устанавливается при создании объекта)
+* Тип клиента (обычный, премиум, VIP)
+* Количество лет, в течение которых клиент совершает покупки (лояльность)
+
+Класс может быть использован в различных системах электронной коммерции, POS-терминалах и программах лояльности для автоматического расчета персонализированных скидок.
+
+```python
+class DiscountCalculator:
+    """Калькулятор скидок для различных товаров и покупателей."""
+    # ... остальной код класса
+```
+
+== Методы класса
+
+=== Метод __init__
+
+Инициализирует новый экземпляр калькулятора скидок с заданным базовым процентом скидки.
+
+```python
+def __init__(self, base_discount_percent=0)
+```
+
+*Параметры:*
+
+* `base_discount_percent` — базовый процент скидки (число), который будет применяться ко всем расчетам (по умолчанию 0)
+
+*Возвращаемое значение:*
+
+Новый экземпляр объекта `DiscountCalculator`.
+
+=== Метод calculate_discount
+
+Рассчитывает сумму скидки на основе исходной цены товара и параметров клиента.
+
+```python
+def calculate_discount(self, price, customer_type="regular", loyalty_years=0)
+```
+
+*Параметры:*
+
+* `price` — исходная цена товара (число), обязательный
+* `customer_type` — тип клиента (строка: 'regular', 'premium', 'vip'), optional
+* `loyalty_years` — количество лет лояльности клиента (целое число), optional
+
+*Возвращаемое значение:*
+
+Сумма скидки (число с плавающей точкой).
+
+*Исключения:*
+
+* `ValueError` — если передан неизвестный тип клиента
+
+// === Метод apply_discount
+
+// Применяет рассчитанную скидку к исходной цене товара и возвращает итоговую цену.
+
+// ```python
+// def apply_discount(self, price, customer_type="regular", loyalty_years=0)
+// ```
+
+// *Параметры:*
+
+// * `price` — исходная цена товара (число), обязательный
+// * `customer_type` — тип клиента (строка: 'regular', 'premium', 'vip'), optional
+// * `loyalty_years` — количество лет лояльности клиента (целое число), optional
+
+// *Возвращаемое значение:*
+
+// Итоговая цена товара после применения скидки (число с плавающей точкой).
+
+=== Метод get_discount_percent
+
+Возвращает процент скидки для указанных параметров клиента без привязки к конкретной цене.
+
+```python
+def get_discount_percent(self, customer_type="regular", loyalty_years=0)
+```
+
+*Параметры:*
+
+* `customer_type` — тип клиента (строка: 'regular', 'premium', 'vip'), optional
+* `loyalty_years` — количество лет лояльности клиента (целое число), optional
+
+*Возвращаемое значение:*
+
+Процент скидки (число с плавающей точкой).
+
+*Исключения:*
+
+* `ValueError` — если передан неизвестный тип клиента
+
+== Пример использования
+
+```python
+# Создание калькулятора с базовой скидкой 2%
+calculator = DiscountCalculator(base_discount_percent=2)
+
+# Расчет для обычного клиента
+regular_price = 1000
+regular_discount = calculator.calculate_discount(regular_price)
+regular_final = calculator.apply_discount(regular_price)
+print(f"Обычный клиент: цена {regular_price}, скидка {regular_discount}, итого {regular_final}")
+
+# Расчет для премиум клиента с 3 годами лояльности
+premium_price = 1000
+premium_discount = calculator.calculate_discount(premium_price, "premium", 3)
+premium_final = calculator.apply_discount(premium_price, "premium", 3)
+print(f"Премиум клиент (3 года): цена {premium_price}, скидка {premium_discount}, итого {premium_final}")
+
+# Расчет для VIP клиента с 7 годами лояльности
+vip_price = 1000
+vip_discount = calculator.calculate_discount(vip_price, "vip", 7)
+vip_final = calculator.apply_discount(vip_price, "vip", 7)
+print(f"VIP клиент (7 лет): цена {vip_price}, скидка {vip_discount}, итого {vip_final}")
+```
+
+*Результат выполнения:*
+
+```bash
+Обычный клиент: цена 1000, скидка 20.0, итого 980.0
+Премиум клиент (3 года): цена 1000, скидка 100.0, итого 900.0
+VIP клиент (7 лет): цена 1000, скидка 170.0, итого 830.0
+```
+
+== Ссылки
+
+* <<_введение,Введение>>
+* <<_методы_класса,Методы класса>>
+* <<_пример_использования,Пример использования>>
+* https://docs.python.org/3/library/exceptions.html[Документация по исключениям Python]
+* https://www.python.org/dev/peps/pep-0008/[Руководство по стилю кода Python (PEP 8)]
