@@ -1,0 +1,77 @@
+= Документация для класса UserController
+:doctype: book
+:toc:
+:toclevels: 2
+
+== Введение
+
+`UserController` управляет простым хранилищем пользователей в памяти через карту `Map`.
+
+```java
+package com.example.controllers;
+
+public class UserController { ... }
+````
+
+\== Методы класса
+
+\=== Метод getUser
+
+Возвращает пользователя по его идентификатору.
+
+```java
+public User getUser(Long id)
+```
+
+*Параметры:*
+
+* `id` — идентификатор пользователя (Long), обязательный
+
+*Возвращаемое значение:*
+
+Объект `User` или `null`, если пользователь не найден
+
+*Исключения:*
+
+Не выбрасывает исключений.
+
+\=== Метод createUser
+
+Создаёт нового пользователя и сохраняет его в базе данных.
+
+```java
+public void createUser(Long id, String name)
+```
+
+*Параметры:*
+
+* `id` — идентификатор пользователя (Long), обязательный
+* `name` — имя пользователя (String), обязательный
+
+*Возвращаемое значение:*
+
+void
+
+*Исключения:*
+
+Не выбрасывает исключений.
+
+\== Пример использования
+
+```java
+UserController uc = new UserController();
+uc.createUser(1L, "Alice");
+User u = uc.getUser(1L);
+```
+
+*Результат выполнения:*
+
+```bash
+u = User{id=1, name='Alice'}
+```
+
+\== Ссылки
+
+* <<\_введение,Введение>>
+* <<\_методы\_класса,Методы класса>>
+* [https://docs.oracle.com/javase/8/docs/api/java/util/HashMap.html\[Документация](https://docs.oracle.com/javase/8/docs/api/java/util/HashMap.html[Документация) HashMap]

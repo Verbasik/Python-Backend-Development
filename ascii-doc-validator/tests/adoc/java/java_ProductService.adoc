@@ -1,0 +1,76 @@
+= Документация для класса ProductService
+:doctype: book
+:toc:
+:toclevels: 2
+
+== Введение
+
+`ProductService` управляет списком продуктов, поддерживая добавление и удаление по SKU.
+
+```java
+package com.example.services;
+
+public class ProductService { ... }
+````
+
+\== Методы класса
+
+\=== Метод addProduct
+
+Добавляет продукт в список.
+
+```java
+public void addProduct(Product p)
+```
+
+*Параметры:*
+
+* `p` — объект `Product`, обязательный
+
+*Возвращаемое значение:*
+
+void
+
+*Исключения:*
+
+Не выбрасывает исключений.
+
+\=== Метод removeProduct
+
+Удаляет продукт по его артикулу (SKU).
+
+```java
+public boolean removeProduct(String sku)
+```
+
+*Параметры:*
+
+* `sku` — артикул продукта (String), обязательный
+
+*Возвращаемое значение:*
+
+`true` — если элемент найден и удалён, иначе `false`
+
+*Исключения:*
+
+Не выбрасывает исключений.
+
+\== Пример использования
+
+```java
+ProductService ps = new ProductService();
+ps.addProduct(new Product("SKU123", "Widget"));
+boolean removed = ps.removeProduct("SKU123");
+```
+
+*Результат выполнения:*
+
+```bash
+removed = true
+```
+
+\== Ссылки
+
+* <<\_введение,Введение>>
+* <<\_методы\_класса,Методы класса>>
+* [https://docs.oracle.com/javase/8/docs/api/java/util/ArrayList.html\[Документация](https://docs.oracle.com/javase/8/docs/api/java/util/ArrayList.html[Документация) ArrayList]

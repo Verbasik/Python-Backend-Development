@@ -1,0 +1,71 @@
+= Документация для класса UserController
+:doctype: book
+:toc:
+:toclevels: 2
+
+== Введение
+
+`UserController` хранит пользователей в памяти и позволяет создавать и получать их.
+
+```python
+class UserController:
+    """Контроллер для управления объектами User."""
+    ...
+````
+
+\== Методы класса
+
+\=== Метод get\_user
+
+Возвращает объект `User` по идентификатору или `None`.
+
+```python
+def get_user(self, user_id: int) -> Optional[User]
+```
+
+*Параметры:*
+
+* `user_id` — идентификатор пользователя (int), обязательный
+
+*Возвращаемое значение:*
+
+`User` или `None`
+
+*Исключения:*
+
+Не выбрасывает исключений.
+
+\=== Метод create\_user
+
+Создаёт пользователя с заданным ID и именем.
+
+```python
+def create_user(self, user_id: int, name: str) -> None
+```
+
+*Параметры:*
+
+* `user_id` — идентификатор (int), обязательный
+* `name` — имя пользователя (str), обязательный
+
+*Возвращаемое значение:*
+
+None
+
+*Исключения:*
+
+Не выбрасывает исключений.
+
+\== Пример использования
+
+```python
+uc = UserController()
+uc.create_user(1, "Alice")
+print(uc.get_user(1))  # User(id=1, name='Alice')
+```
+
+\== Ссылки
+
+* <<\_введение,Введение>>
+* <<\_методы\_класса,Методы класса>>
+* [https://docs.python.org/3/library/typing.html\[Документация](https://docs.python.org/3/library/typing.html[Документация) typing]

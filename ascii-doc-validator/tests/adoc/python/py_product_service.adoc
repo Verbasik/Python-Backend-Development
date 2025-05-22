@@ -1,0 +1,70 @@
+= Документация для класса ProductService
+:doctype: book
+:toc:
+:toclevels: 2
+
+== Введение
+
+`ProductService` управляет списком объектов `Product`, позволяя добавлять и удалять их по SKU.
+
+```python
+class ProductService:
+    """Сервис управления продуктами."""
+    ...
+````
+
+\== Методы класса
+
+\=== Метод add\_product
+
+Добавляет продукт в список.
+
+```python
+def add_product(self, product: Product) -> None
+```
+
+*Параметры:*
+
+* `product` — объект `Product`, обязательный
+
+*Возвращаемое значение:*
+
+None
+
+*Исключения:*
+
+Не выбрасывает исключений.
+
+\=== Метод remove\_product
+
+Удаляет все продукты с данным SKU.
+
+```python
+def remove_product(self, sku: str) -> bool
+```
+
+*Параметры:*
+
+* `sku` — артикул продукта (str), обязательный
+
+*Возвращаемое значение:*
+
+`True`, если хотя бы один продукт был удалён, иначе `False`
+
+*Исключения:*
+
+Не выбрасывает исключений.
+
+\== Пример использования
+
+```python
+ps = ProductService()
+ps.add_product(Product("SKU123", "Widget"))
+print(ps.remove_product("SKU123"))  # True
+```
+
+\== Ссылки
+
+* <<\_введение,Введение>>
+* <<\_методы\_класса,Методы класса>>
+* [https://docs.python.org/3/tutorial/datastructures.html\[list](https://docs.python.org/3/tutorial/datastructures.html[list) comprehensions]

@@ -1,0 +1,77 @@
+= Документация для класса StringUtils
+:doctype: book
+:toc:
+:toclevels: 2
+
+== Введение
+
+Класс `StringUtils` содержит утилитарные методы для работы со строками: приведение к заглавной и реверс.
+
+```java
+package com.example;
+
+public class StringUtils { ... }
+````
+
+\== Методы класса
+
+\=== Метод capitalize
+
+Метод преобразует первую букву строки в заглавную, остальные остаются без изменений.
+
+```java
+public String capitalize(String input)
+```
+
+*Параметры:*
+
+* `input` — исходная строка (String), обязательный
+
+*Возвращаемое значение:*
+
+Строка с заглавной первой буквой (String)
+
+*Исключения:*
+
+Не выбрасывает исключений.
+
+\=== Метод reverse
+
+Метод возвращает новую строку, являющуюся обратной исходной.
+
+```java
+public String reverse(String input)
+```
+
+*Параметры:*
+
+* `input` — исходная строка (String), обязательный
+
+*Возвращаемое значение:*
+
+Перевернутая строка (String)
+
+*Исключения:*
+
+Не выбрасывает исключений.
+
+\== Пример использования
+
+```java
+StringUtils utils = new StringUtils();
+String cap = utils.capitalize("hello");
+String rev = utils.reverse("world");
+```
+
+*Результат выполнения:*
+
+```bash
+cap = Hello
+rev = dlrow
+```
+
+\== Ссылки
+
+* <<\_введение,Введение>>
+* <<\_методы\_класса,Методы класса>>
+* [https://docs.oracle.com/javase/8/docs/api/java/lang/StringBuilder.html\[Документация](https://docs.oracle.com/javase/8/docs/api/java/lang/StringBuilder.html[Документация) StringBuilder]
