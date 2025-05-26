@@ -1,3 +1,4 @@
+# tests/code/python/string_utils.py
 class StringUtils:
     """Утилитарные методы работы со строками."""
 

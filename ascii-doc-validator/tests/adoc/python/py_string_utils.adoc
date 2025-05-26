@@ -13,9 +13,9 @@ class StringUtils:
     ...
 ````
 
-\== Методы класса
+== Методы класса
 
-\=== Метод capitalize
+=== Метод capitalize
 
 Преобразует первую букву строки в заглавную.
 
@@ -35,7 +35,7 @@ def capitalize(input_str: str) -> str
 
 Не выбрасывает исключений.
 
-\=== Метод reverse
+=== Метод reverse
 
 Возвращает обратную строку.
 
@@ -55,7 +55,7 @@ def reverse(input_str: str) -> str
 
 Не выбрасывает исключений.
 
-\== Пример использования
+== Пример использования
 
 ```python
 print(StringUtils.capitalize("hello"))  # Hello

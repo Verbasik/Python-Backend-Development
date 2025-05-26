@@ -13,9 +13,9 @@ package com.example.services;
 public class ProductService { ... }
 ````
 
-\== Методы класса
+== Методы класса
 
-\=== Метод addProduct
+=== Метод addProduct
 
 Добавляет продукт в список.
 
@@ -35,7 +35,7 @@ void
 
 Не выбрасывает исключений.
 
-\=== Метод removeProduct
+=== Метод removeProduct
 
 Удаляет продукт по его артикулу (SKU).
 
@@ -55,7 +55,7 @@ public boolean removeProduct(String sku)
 
 Не выбрасывает исключений.
 
-\== Пример использования
+== Пример использования
 
 ```java
 ProductService ps = new ProductService();

@@ -57,33 +57,45 @@
 - id: COMPLETENESS-METHOD-001
   name: Method documentation completeness
   description: |
-    Убедиться, что каждый public-метод из Java-кода задокументирован в AsciiDoc.
+    Убедиться, что каждый public-метод из кода задокументирован в AsciiDoc.
   type: COMPLETENESS
   severity: ERROR
   config:
     # Отделяем имя класса от имени метода
-    ## Группа 1 = имя класса, Группа 2 = имя метода
     method_name_pattern: "([^.]+)\\.([^.]+)"
-    # Методы определения секций с описаниями методов
+    # Расширенные методы определения секций с описаниями методов
     method_section_markers:
       - type: "title_pattern"
         pattern: "Метод\\s+{method_name_short}"
+        flags: "IGNORECASE"
       - type: "title_pattern"
         pattern: "Method\\s+{method_name_short}"
+        flags: "IGNORECASE"
+      - type: "title_pattern"
+        pattern: "Функция\\s+{method_name_short}"
+        flags: "IGNORECASE"
+      - type: "title_pattern"
+        pattern: "Function\\s+{method_name_short}"
+        flags: "IGNORECASE"
       - type: "title_exact"
         pattern: "{method_name_short}"
+        flags: "IGNORECASE"
       - type: "content_pattern"
-        pattern: "```\\w*\\s*(?:public|private|protected)?\\s+\\w+\\s+{method_name_short}\\s*\\("
+        pattern: "```\\w*\\s*(?:public|private|protected|def)?\\s+\\w*\\s*{method_name_short}\\s*\\("
+        flags: "IGNORECASE"
     # Параметры для извлечения информации о параметрах метода
     parameter_markers:
       - type: "block"
         pattern: "\\*Параметры:\\*\\s*(.*?)(?=\\*|\\Z)"
-        format: "\\*\\s*`([^`]+)`\\s*—\\s*([^*\\n]+)"
+        format: "\\*\\s*`([^`]+)`\\s*[—-]\\s*([^*\\n]+)"
+        flags: "IGNORECASE|DOTALL"
       - type: "block"
         pattern: "\\*Parameters:\\*\\s*(.*?)(?=\\*|\\Z)"
-        format: "\\*\\s*`([^`]+)`\\s*-\\s*([^*\\n]+)"
+        format: "\\*\\s*`([^`]+)`\\s*[-—]\\s*([^*\\n]+)"
+        flags: "IGNORECASE|DOTALL"
       - type: "inline"
         pattern: "@param\\s+(\\w+)\\s+([^\\n@]*)"
+        flags: "IGNORECASE"
     # Контейнеры методов - секции, которые могут содержать описания методов
     method_containers:
       - "Методы класса"
@@ -94,3 +106,19 @@
       - "API Reference"
       - "Функции"
       - "Functions"
+    # Исключения - секции, которые НЕ являются методами
+    excluded_sections:
+      - "Введение"
+      - "Introduction"
+      - "Описание"
+      - "Description"
+      - "Обзор"
+      - "Overview"
+      - "Установка"
+      - "Installation"
+      - "Примеры"
+      - "Examples"
+      - "Использование"
+      - "Usage"
+      - "Заключение"
+      - "Conclusion"

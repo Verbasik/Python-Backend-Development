@@ -22,6 +22,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 # Импорты внутренних модулей
 from controllers.validation_controller import router as validation_router
+from s3.client import minio_client, MinioException
 
 
 # Создание экземпляра FastAPI
@@ -73,3 +74,29 @@ async def root() -> dict:
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+
+    # Тестируем существование бакета
+    bucket_name = "ktalk"
+    if minio_client.is_bucket_exists(bucket_name):
+        print(f"Bucket '{bucket_name}' exists")
+
+    # Тестируем существование директории
+    directory_path = "doc"
+    if minio_client.is_directory_exists(bucket_name, directory_path):
+        print(f"Directory '{directory_path}' exists in bucket '{bucket_name}'")
+
+    # Пример скачивания файлов из директории
+    try:
+        downloaded_files = minio_client.download_files_from_directory(
+            bucket_name=bucket_name,
+            directory_path=directory_path,
+            preserve_structure=True
+        )
+        print(f"Downloaded {len(downloaded_files)} files:")
+        for file_path in downloaded_files:
+            print(f"  - {file_path}")
+    except MinioException as e:
+        print(f"Error: {e}")
+    
+    # Опционально: очистка temp директории
+    minio_client.clear_temp_directory()

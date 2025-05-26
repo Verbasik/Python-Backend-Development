@@ -13,9 +13,9 @@ class ProductService:
     ...
 ````
 
-\== Методы класса
+== Методы класса
 
-\=== Метод add\_product
+=== Метод add\_product
 
 Добавляет продукт в список.
 
@@ -35,7 +35,7 @@ None
 
 Не выбрасывает исключений.
 
-\=== Метод remove\_product
+=== Метод remove\_product
 
 Удаляет все продукты с данным SKU.
 
@@ -55,7 +55,7 @@ def remove_product(self, sku: str) -> bool
 
 Не выбрасывает исключений.
 
-\== Пример использования
+== Пример использования
 
 ```python
 ps = ProductService()

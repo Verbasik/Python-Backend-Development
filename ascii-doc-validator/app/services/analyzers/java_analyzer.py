@@ -296,10 +296,21 @@ class JavaAnalyzer(LanguageSpecificAnalyzer):
         for declarator in field.declarators:
             default_value = None
             if hasattr(declarator, 'initializer') and declarator.initializer:
-                if hasattr(declarator.initializer, 'value'):
-                    default_value = declarator.initializer.value
-                elif hasattr(declarator.initializer, 'qualifier'):
-                    default_value = f"{declarator.initializer.qualifier}.{declarator.initializer.member}"
+                # Исправление: обработка различных типов инициализаторов
+                try:
+                    if hasattr(declarator.initializer, 'value'):
+                        default_value = str(declarator.initializer.value)
+                    elif hasattr(declarator.initializer, 'qualifier') and hasattr(declarator.initializer, 'member'):
+                        default_value = f"{declarator.initializer.qualifier}.{declarator.initializer.member}"
+                    elif hasattr(declarator.initializer, 'member'):
+                        # Для случаев когда есть только member без qualifier
+                        default_value = str(declarator.initializer.member)  
+                    else:
+                        # Общий случай - преобразуем в строку
+                        default_value = str(declarator.initializer)
+                except AttributeError:
+                    # Если возникает ошибка атрибута, просто преобразуем в строку
+                    default_value = str(declarator.initializer)
             
             result.append(FieldInfo(
                 name=declarator.name,
@@ -444,3 +455,4 @@ class JavaAnalyzer(LanguageSpecificAnalyzer):
             interfaces=[],  # TODO: Добавить поддержку интерфейсов
             constants=[]    # TODO: Добавить поддержку констант
         )
+    

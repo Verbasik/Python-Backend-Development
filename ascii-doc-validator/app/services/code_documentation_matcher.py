@@ -57,6 +57,10 @@ class CodeDocumentationMatcher:
             source_code_analyzer: Анализатор исходного кода (опционально).
         """
         self.source_code_analyzer = source_code_analyzer or SourceCodeAnalyzer()
+        self._IGNORED_METHOD_PATTERNS: Tuple[re.Pattern, ...] = (
+        re.compile(r"^__.*__$"),    # dunder-методы (__init__, __str__ …)
+        re.compile(r"^_.*"),        # «защищённые»/приватные _helper()
+    )
 
     def match_api_endpoints(
         self, code_structure: CodeStructure, doc_structure: Dict[str, Any]
@@ -422,42 +426,102 @@ class CodeDocumentationMatcher:
         
         return endpoints
 
-    def _extract_code_methods(self, code_structure: CodeStructure) -> Dict[str, Any]:
+    def _identify_method_section(
+        self, section: Dict[str, Any], patterns: List[Dict[str, Any]]
+    ) -> Tuple[bool, Optional[str]]:
         """
         Description:
         ---------------
-            Извлекает все методы и функции из структуры кода.
+            Определяет, описывает ли секция метод, и возвращает его имя.
+            Поддерживаются заголовки с экранированным символом «\_».
 
         Args:
         ---------------
-            code_structure: Структурированное представление кода.
+            section: Словарь, описывающий секцию документации.
+            patterns: Список паттернов для поиска в тексте.
 
         Returns:
         ---------------
-            Dict[str, Any]: Словарь, где ключ - имя метода или функции,
-                            значение - информация о методе или функции.
+            Кортеж: (флаг наличия метода, имя метода при наличии)
+
+        Examples:
+        ---------------
+            >>> _identify_method_section(sec, patterns)
+            (True, "my_method")
         """
-        methods = {}
-        
-        # Извлекаем методы из классов
+        title = section.get("title", "")
+        content = section.get("content", "")
+
+        # дополнительная нормализация для всех проверок
+        norm_title = title.replace("\\_", "_")
+
+        # 0. Быстрое правило «одиночное слово в нижнем регистре»
+        if re.match(r"^\w+$", norm_title) and norm_title[0].islower():
+            return True, norm_title
+
+        # 1. Проверка пользовательских паттернов
+        for p in patterns:
+            target = p["apply_to"]
+            regex = re.compile(p["regex"], re.IGNORECASE)
+            haystack = norm_title if target == "title" else content
+            m = regex.search(haystack)
+            if m:
+                return True, m.group(1).replace("\\_", "_")
+
+        # 2. Heuristics: наличие @param / signature внутри кода
+        if any(tag in content for tag in ("@param", "@return", "@throws")):
+            sig = re.search(
+                r"(?:def|function|public|private|protected)\s+(\w+)\s*\(",
+                content
+            )
+            if sig:
+                return True, sig.group(1)
+
+        return False, None
+
+    def _extract_code_methods(self, code_structure: 'CodeStructure') -> Dict[str, Any]:
+        """
+        Description:
+        ---------------
+            Извлекает все публичные методы и функции из структуры кода.
+            Dunder- и приватные методы по умолчанию игнорируются.
+
+        Args:
+        ---------------
+            code_structure: Структура исходного кода.
+
+        Returns:
+        ---------------
+            Словарь с именами методов и их атрибутами.
+        """
+        methods: Dict[str, Any] = {}
+
+        def _is_ignored(name: str) -> bool:
+            return any(p.match(name) for p in self._IGNORED_METHOD_PATTERNS)
+
+        # --- Методы классов ---
         for cls in code_structure.classes:
             for method in cls.methods:
+                if _is_ignored(method.name):
+                    continue
                 methods[f"{cls.name}.{method.name}"] = {
                     "class_name": cls.name,
                     "line_start": method.line_start,
                     "line_end": method.line_end,
-                    "method": method
+                    "method": method,
                 }
-        
-        # Извлекаем функции верхнего уровня
+
+        # --- Функции верхнего уровня ---
         for func in code_structure.functions:
+            if _is_ignored(func.name):
+                continue
             methods[func.name] = {
                 "class_name": None,
                 "line_start": func.line_start,
                 "line_end": func.line_end,
-                "method": func
+                "method": func,
             }
-        
+
         return methods
 
     def _extract_doc_methods(self, doc_structure: Dict[str, Any]) -> Dict[str, Any]:
@@ -468,57 +532,112 @@ class CodeDocumentationMatcher:
 
         Args:
         ---------------
-            doc_structure: Структурированное представление документации.
+            doc_structure: Структура документации.
 
         Returns:
         ---------------
-            Dict[str, Any]: Словарь, где ключ - имя метода,
-                            значение - информация о методе.
+            Словарь с найденными методами и их параметрами.
         """
-        methods = {}
-        
-        # Извлекаем имя класса из документации
+        methods: Dict[str, Any] = {}
         class_name = self._extract_class_name(doc_structure)
-        
-        # Получаем шаблоны для распознавания методов
-        method_patterns = self._get_method_patterns()
-        
-        # Определяем секции, которые могут содержать методы
-        potential_method_sections = []
-        
-        # 1. Находим секции с методами по иерархии (дочерние секции "Методы класса" и подобных)
-        methods_container_sections = self._find_methods_container_sections(doc_structure)
-        
-        # 2. Если найдены контейнеры для методов, ищем в них и их дочерних секциях
-        if methods_container_sections:
-            for container in methods_container_sections:
-                # Добавляем потенциальные дочерние секции
-                for section in doc_structure.get("sections", []):
-                    if self._is_child_section(section, container):
-                        potential_method_sections.append(section)
-        # 3. Если контейнеры не найдены, проверяем все секции
-        else:
-            potential_method_sections = doc_structure.get("sections", [])
-        
-        # Анализируем потенциальные секции с методами
-        for section in potential_method_sections:
-            # Используем различные методы определения, является ли секция описанием метода
-            is_method_section, method_name = self._identify_method_section(section, method_patterns)
-            
-            if is_method_section and method_name:
-                # Извлекаем параметры метода
-                parameters = self._extract_parameters_from_section(section)
-                
-                # Формируем полное имя метода
-                full_method_name = f"{class_name}.{method_name}" if class_name else method_name
-                
-                methods[full_method_name] = {
-                    "doc_line": section.get("line_number"),
-                    "section": section.get("title"),
-                    "parameters": parameters
-                }
-        
+        patterns = self._get_method_patterns()
+
+        # -- 1. ищем контейнеры «Методы …» --
+        containers = self._find_methods_container_sections(doc_structure)
+
+        # -- 2. формируем список секций-кандидатов --
+        candidate_sections = []
+        if containers:
+            for c in containers:
+                candidate_sections.append(c)  # сам контейнер
+                candidate_sections.extend(   # дочерние
+                    [s for s in doc_structure.get("sections", [])
+                    if self._is_child_section(s, c)]
+                )
+        else:  # fallback
+            candidate_sections = doc_structure.get("sections", [])
+
+        # -- 3. анализ секций --
+        for sec in candidate_sections:
+            cleaned_title = self._clean_method_title(sec.get("title", ""))
+            sec_copy = sec.copy()
+            sec_copy["title"] = cleaned_title
+
+            is_method, name = self._identify_method_section(sec_copy, patterns)
+            if not (is_method and name):
+                continue
+            if self._is_service_section(name, sec):
+                continue
+
+            full_name = f"{class_name}.{name}" if class_name else name
+            methods[full_name] = {
+                "doc_line": sec.get("line_number"),
+                "section": sec.get("title"),
+                "parameters": self._extract_parameters_from_section(sec),
+            }
+
         return methods
+
+    def _clean_method_title(self, title: str) -> str:
+        """
+        Description:
+        ---------------
+            Очищает заголовок секции от служебных слов.
+
+        Args:
+        ---------------
+            title: Оригинальный заголовок секции.
+
+        Returns:
+        ---------------
+            str: Очищенный заголовок.
+        """
+        # 1) префиксы
+        cleaned = re.sub(r"^(Метод|Method|Функция|Function)\s+", "", title, flags=re.I).strip()
+        # 2) убираем обратный слэш перед *_`
+        cleaned = re.sub(r"\\([*_`])", r"\1", cleaned)
+        # 3) нормализуем пробелы
+        cleaned = re.sub(r"\s{2,}", " ", cleaned)
+        return cleaned
+
+    def _is_service_section(self, method_name: str, section: Dict[str, Any]) -> bool:
+        """
+        Description:
+        ---------------
+            Проверяет, является ли секция служебной (не описанием метода).
+
+        Args:
+        ---------------
+            method_name: Предполагаемое имя метода.
+            section: Секция документации.
+
+        Returns:
+        ---------------
+            bool: True, если секция служебная.
+        """
+        service_names = [
+            "введение", "introduction", "описание", "description",
+            "обзор", "overview", "установка", "installation",
+            "конфигурация", "configuration", "примеры", "examples",
+            "использование", "usage", "заключение", "conclusion"
+        ]
+
+        # Проверяем имя метода
+        if method_name.lower() in service_names:
+            return True
+
+        # Проверяем содержимое
+        content = section.get("content", "")
+        has_method_signature = bool(
+            re.search(r'(def\s+\w+\(|function\s+\w+\(|public\s+\w+\s+\w+\()', content)
+        )
+        has_code_block = "```" in content or "----" in content
+
+        # Эвристика на служебные секции
+        if not has_method_signature and not has_code_block and len(method_name) < 3:
+            return True
+
+        return False
 
     def _extract_class_name(self, doc_structure: Dict[str, Any]) -> Optional[str]:
         """
@@ -676,56 +795,6 @@ class CodeDocumentationMatcher:
         
         return section_line > parent_line
 
-    def _identify_method_section(self, section: Dict[str, Any], patterns: List[Dict[str, Any]]) -> Tuple[bool, Optional[str]]:
-        """
-        Description:
-        ---------------
-            Определяет, является ли секция описанием метода, и извлекает имя метода.
-
-        Args:
-        ---------------
-            section: Секция документации.
-            patterns: Список шаблонов для распознавания методов.
-
-        Returns:
-        ---------------
-            Tuple[bool, Optional[str]]: (is_method, method_name)
-        """
-        # Проверяем шаблоны в порядке приоритета
-        for pattern in patterns:
-            regex = pattern["regex"]
-            target = pattern["apply_to"]
-            
-            if target == "title" and "title" in section:
-                match = re.search(regex, section["title"], re.IGNORECASE)
-                if match:
-                    return True, match.group(1)
-            
-            elif target == "content" and "content" in section:
-                match = re.search(regex, section["content"], re.IGNORECASE | re.DOTALL)
-                if match:
-                    return True, match.group(1)
-        
-        # Дополнительные эвристики
-        
-        # 1. Если заголовок содержит "return", "param", "@return", "@param" - вероятно это метод
-        if "content" in section:
-            javadoc_elements = ["@return", "@param", "@throws", "@exception"]
-            if any(element in section["content"] for element in javadoc_elements):
-                # Пытаемся найти имя метода в блоке кода
-                code_match = re.search(r"```\w*\s*(?:public|private|protected)?\s+\w+\s+(\w+)\s*\(", 
-                                      section["content"], re.IGNORECASE | re.DOTALL)
-                if code_match:
-                    return True, code_match.group(1)
-        
-        # 2. Если в заголовке есть только одно слово, и оно выглядит как имя метода
-        if "title" in section:
-            title = section["title"].strip()
-            if re.match(r"^\w+$", title) and title[0].islower() and not title.isupper():
-                return True, title
-        
-        return False, None
-
     def _extract_parameters_from_section(self, section: Dict[str, Any]) -> List[Dict[str, Any]]:
         """
         Description:
@@ -862,3 +931,4 @@ class CodeDocumentationMatcher:
             "doc_line": section.get("line_number"),
             "section": section.get("title")
         }
+    
