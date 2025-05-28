@@ -18,9 +18,9 @@ import re
 from typing import Dict, List, Optional, Any, Tuple
 
 # Импорты внутренних модулей
-from models.code_structure import CodeStructure, ClassInfo, MethodInfo, ParameterInfo
-from models.validation_report import ValidationIssue, IssueType, IssueLocation
-from services.source_code_analyzer import SourceCodeAnalyzer
+from app.models.code_structure import CodeStructure, ClassInfo, MethodInfo, ParameterInfo
+from app.models.validation_report import ValidationIssue, IssueType, IssueLocation
+from app.services.source_code_analyzer import SourceCodeAnalyzer
 
 
 class CodeDocumentationMatcher:
@@ -433,7 +433,7 @@ class CodeDocumentationMatcher:
         Description:
         ---------------
             Определяет, описывает ли секция метод, и возвращает его имя.
-            Поддерживаются заголовки с экранированным символом «\_».
+            Поддерживаются заголовки с экранированным символом.
 
         Args:
         ---------------

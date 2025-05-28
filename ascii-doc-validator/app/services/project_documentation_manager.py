@@ -18,8 +18,8 @@ import re
 from typing import Dict, List, Optional, Any
 from pathlib import Path
 
-from services.documentation_parser import DocumentationParser
-from models.code_structure import LanguageType
+from app.services.documentation_parser import DocumentationParser
+from app.models.code_structure import LanguageType
 
 
 class ProjectDocumentationManager:

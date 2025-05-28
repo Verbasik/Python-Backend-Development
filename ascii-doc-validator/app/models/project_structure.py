@@ -14,7 +14,7 @@
 from typing import Dict, List, Optional, Any
 from pydantic import BaseModel, Field
 
-from models.code_structure import CodeStructure
+from app.models.code_structure import CodeStructure
 
 
 class FileMapping(BaseModel):

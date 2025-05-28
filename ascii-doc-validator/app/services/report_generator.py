@@ -17,7 +17,7 @@
 import json
 
 # Импорты внутренних моделей
-from models.validation_report import ValidationIssue, IssueType, ValidationReport
+from app.models.validation_report import ValidationIssue, IssueType, ValidationReport
 
 # Импорты сторонних библиотек
 from typing import List, Dict, Any

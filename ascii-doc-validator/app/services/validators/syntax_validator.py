@@ -21,7 +21,7 @@ import requests
 from typing import List, Dict, Any, Tuple, Set, Optional
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
-from models.validation_report import ValidationIssue, IssueType, IssueLocation
+from app.models.validation_report import ValidationIssue, IssueType, IssueLocation
 
 
 class SyntaxValidator:

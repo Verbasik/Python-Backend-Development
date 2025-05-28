@@ -20,7 +20,7 @@ from minio.error import S3Error
 # ------------------------------
 # Локальные импорты
 # ------------------------------
-from config.configuration_minio import MinioConfiguration, minio_config
+from app.config.configuration_minio import MinioConfiguration, minio_config
 
 
 # Настройка логирования

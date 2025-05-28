@@ -18,11 +18,11 @@ import os
 from typing import Dict, List, Optional, Any
 
 # Импорты внутренних модулей
-from services.analyzers.analyzer_factory import AnalyzerFactory, detect_language_from_file
-from services.analyzers import analyzer_factory
-from models.code_structure import CodeStructure, LanguageType
-from models.project_structure import ProjectStructure
-from services.project_documentation_manager import ProjectDocumentationManager
+from app.services.analyzers.analyzer_factory import AnalyzerFactory, detect_language_from_file
+from app.services.analyzers import analyzer_factory
+from app.models.code_structure import CodeStructure, LanguageType
+from app.models.project_structure import ProjectStructure
+from app.services.project_documentation_manager import ProjectDocumentationManager
 
 
 class SourceCodeAnalyzer:

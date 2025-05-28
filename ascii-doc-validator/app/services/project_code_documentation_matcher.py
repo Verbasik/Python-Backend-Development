@@ -19,13 +19,13 @@ import uuid
 from datetime import datetime
 from typing import List, Dict, Set, Tuple, Optional, Any
 
-from models.code_structure import LanguageType
-from models.code_structure import CodeStructure
-from models.validation_report import (
+from app.models.code_structure import LanguageType
+from app.models.code_structure import CodeStructure
+from app.models.validation_report import (
     ValidationIssue, ValidationReport, ValidationStatus, ValidationSummary, IssueType, IssueLocation
 )
-from services.source_code_analyzer import SourceCodeAnalyzer
-from services.code_documentation_matcher import CodeDocumentationMatcher
+from app.services.source_code_analyzer import SourceCodeAnalyzer
+from app.services.code_documentation_matcher import CodeDocumentationMatcher
 
 
 class ProjectCodeDocumentationMatcher:

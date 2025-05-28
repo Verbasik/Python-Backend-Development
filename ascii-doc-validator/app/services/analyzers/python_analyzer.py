@@ -20,8 +20,8 @@ import inspect
 from typing import Dict, List, Optional, Any, Tuple, Set, Union
 
 # Импорты внутренних модулей
-from services.analyzers.language_specific_analyzer import LanguageSpecificAnalyzer
-from models.code_structure import (
+from app.services.analyzers.language_specific_analyzer import LanguageSpecificAnalyzer
+from app.models.code_structure import (
     CodeStructure, ClassInfo, MethodInfo, FieldInfo, ParameterInfo, 
     AnnotationInfo, ImportInfo, LanguageType
 )

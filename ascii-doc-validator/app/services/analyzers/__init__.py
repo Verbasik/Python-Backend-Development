@@ -12,10 +12,10 @@
 """
 
 # Импорты внутренних модулей
-from models.code_structure import LanguageType
-from services.analyzers.analyzer_factory import AnalyzerFactory
-from services.analyzers.java_analyzer import JavaAnalyzer
-from services.analyzers.python_analyzer import PythonAnalyzer
+from app.models.code_structure import LanguageType
+from app.services.analyzers.analyzer_factory import AnalyzerFactory
+from app.services.analyzers.java_analyzer import JavaAnalyzer
+from app.services.analyzers.python_analyzer import PythonAnalyzer
 
 # Инициализация фабрики анализаторов
 analyzer_factory = AnalyzerFactory()

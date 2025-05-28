@@ -20,7 +20,7 @@ from typing import Dict, List, Set, Optional, Any
 from abc import ABC, abstractmethod
 
 # Импорты внутренних моделей
-from models.code_structure import CodeStructure, LanguageType
+from app.models.code_structure import CodeStructure, LanguageType
 
 
 class CodeAnalyzer(ABC):

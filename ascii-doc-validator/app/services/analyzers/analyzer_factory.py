@@ -18,9 +18,9 @@ import os
 from typing import Dict, Type, List, Optional
 
 # Импорты внутренних модулей
-from services.analyzers.code_analyzer import CodeAnalyzer
-from services.analyzers.language_specific_analyzer import LanguageSpecificAnalyzer
-from models.code_structure import LanguageType
+from app.services.analyzers.code_analyzer import CodeAnalyzer
+from app.services.analyzers.language_specific_analyzer import LanguageSpecificAnalyzer
+from app.models.code_structure import LanguageType
 
 # Словарь соответствия расширений файлов и языков программирования
 LANGUAGE_EXTENSIONS = {

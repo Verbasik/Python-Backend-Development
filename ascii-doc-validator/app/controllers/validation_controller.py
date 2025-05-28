@@ -31,16 +31,16 @@ from fastapi.responses import JSONResponse
 from typing import Optional
 
 # Импорты внутренних сервисов
-from services.documentation_parser import DocumentationParser
-from services.validation_rule_engine import ValidationRuleEngine
-from services.report_generator import ReportGenerator
-from config.configuration_manager import ConfigurationManager
-from services.validators.syntax_validator import SyntaxValidator
-from services.source_code_analyzer import SourceCodeAnalyzer
-from services.code_documentation_matcher import CodeDocumentationMatcher
-from models.validation_report import IssueType, ValidationStatus
-from services.project_documentation_manager import ProjectDocumentationManager
-from services.project_code_documentation_matcher import ProjectCodeDocumentationMatcher
+from app.services.documentation_parser import DocumentationParser
+from app.services.validation_rule_engine import ValidationRuleEngine
+from app.services.report_generator import ReportGenerator
+from app.config.configuration_manager import ConfigurationManager
+from app.services.validators.syntax_validator import SyntaxValidator
+from app.services.source_code_analyzer import SourceCodeAnalyzer
+from app.services.code_documentation_matcher import CodeDocumentationMatcher
+from app.models.validation_report import IssueType, ValidationStatus
+from app.services.project_documentation_manager import ProjectDocumentationManager
+from app.services.project_code_documentation_matcher import ProjectCodeDocumentationMatcher
 
 router = APIRouter()
 

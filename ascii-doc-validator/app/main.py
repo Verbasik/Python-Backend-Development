@@ -21,8 +21,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 # Импорты внутренних модулей
-from controllers.validation_controller import router as validation_router
-from s3.client import minio_client, MinioException
+from app.controllers.validation_controller import router as validation_router
+from app.s3.client import minio_client, MinioException
 
 
 # Создание экземпляра FastAPI
@@ -73,7 +73,7 @@ async def root() -> dict:
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
 
     # Тестируем существование бакета
     bucket_name = "ktalk"

@@ -17,8 +17,8 @@
 from typing import Dict, List, Optional, Any
 
 # Импорты внутренних модулей
-from services.analyzers.code_analyzer import CodeAnalyzer
-from models.code_structure import LanguageType
+from app.services.analyzers.code_analyzer import CodeAnalyzer
+from app.models.code_structure import LanguageType
 
 
 class LanguageSpecificAnalyzer(CodeAnalyzer):

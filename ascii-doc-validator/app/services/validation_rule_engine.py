@@ -18,14 +18,14 @@ import uuid
 from datetime import datetime
 
 # Импорты внутренних моделей
-from models.validation_report import (
+from app.models.validation_report import (
     ValidationIssue,
     ValidationReport,
     ValidationStatus,
     ValidationSummary,
     IssueType
 )  # Модели для отчетов о валидации
-from models.validation_rule import ValidationRule
+from app.models.validation_rule import ValidationRule
 from .validators.syntax_validator import SyntaxValidator
 
 # Импорты сторонних библиотек
